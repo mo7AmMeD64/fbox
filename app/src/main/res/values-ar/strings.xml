@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_settings">الإعدادات</string>
+    <string name="nav_saved">المحفوظات</string>
+    <string name="nav_search">بحث</string>
+    <string name="nav_home">الرئيسية</string>
+
+    <string name="search">بحث</string>
+    <string name="genres">التصنيفات</string>
+    <string name="movie">أفلام</string>
+    <string name="series">مسلسلات</string>
+    <string name="trending">الرائج</string>
+    <string name="about">نبذة</string>
+    <string name="episodes">الحلقات</string>
+    <string name="episode_n">الحلقة %1$d</string>
+    <string name="season_n">الموسم %1$d</string>
+    <string name="play_movie">تشغيل الفيلم</string>
+    <string name="play">تشغيل</string>
+    <string name="imdb_rating">%1$s imdb</string>
+    <string name="imdb_unrated">– imdb</string>
+    <string name="no_story">لا توجد قصة متاحة لهذا العمل حاليًا.</string>
+    <string name="more_like_this">أعمال مشابهة</string>
+    <string name="cast">طاقم التمثيل</string>
+    <string name="available_audio">اللغات المتاحة: %1$s</string>
+    <string name="type_series">مسلسل</string>
+    <string name="type_movie">فيلم</string>
+
+    <string name="loading">جارٍ التحميل…</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="error_generic">حدث خطأ: %1$s</string>
+    <string name="nothing_here">لا يوجد شيء لعرضه بعد.</string>
+    <string name="search_hint_idle">اكتب اسم فيلم أو مسلسل للبحث.</string>
+    <string name="search_no_results">لا نتائج عن «%1$s».</string>
+    <string name="load_more">عرض المزيد</string>
+
+    <string name="saved_empty_title">لا توجد عناصر محفوظة</string>
+    <string name="saved_empty_body">اضغط على القلب في أي عمل ليظهر هنا.</string>
+    <string name="saved_added">تم حفظ «%1$s»</string>
+    <string name="saved_removed">تمت إزالة «%1$s»</string>
+    <string name="undo">تراجع</string>
+    <string name="save">حفظ</string>
+    <string name="unsave">إزالة من المحفوظات</string>
+    <string name="back">رجوع</string>
+
+    <string name="settings_content">المحتوى</string>
+    <string name="settings_adult">محتوى البالغين</string>
+    <string name="settings_adult_desc">إظهار الأعمال المخفية افتراضيًا. مغلق افتراضيًا.</string>
+    <string name="settings_adult_confirm_title">إظهار محتوى البالغين؟</string>
+    <string name="settings_adult_confirm_body">ستظهر الأعمال التي تُصفّى عادةً في القوائم والبحث. فعّل هذا الخيار فقط إن كنت بالغًا.</string>
+    <string name="settings_enable">تفعيل</string>
+    <string name="cancel">إلغاء</string>
+    <string name="settings_server">الخادم</string>
+    <string name="settings_server_desc">يُستخدم لكل طلبات الكتالوج. بدّله إذا كان بطيئًا أو محجوبًا.</string>
+    <string name="settings_player">المشغّل</string>
+    <string name="settings_hwdec">فك الترميز بالعتاد</string>
+    <string name="settings_hwdec_desc">أسرع وأبرد. أوقفه إن ظهر الفيديو أخضر أو مشوّهًا.</string>
+    <string name="settings_tls">التحقق من شهادات HTTPS</string>
+    <string name="settings_tls_desc">أوقفه فقط إذا فشل فتح الروابط.</string>
+    <string name="settings_sub_lang">لغات الترجمة المفضلة</string>
+    <string name="settings_sub_lang_desc">مفصولة بفواصل، مثل: arabic,ar,english</string>
+    <string name="settings_data">البيانات</string>
+    <string name="settings_clear_saved">مسح المحفوظات</string>
+    <string name="settings_clear_saved_confirm">حذف كل الأعمال المحفوظة (%1$d)؟ لا يمكن التراجع.</string>
+    <string name="settings_clear_saved_done">تم مسح المحفوظات</string>
+    <string name="settings_reset_token">إعادة ضبط الجلسة</string>
+    <string name="settings_reset_token_desc">نسيان الرمز المخزّن وطلب رمز جديد.</string>
+    <string name="settings_reset_token_done">تمت إعادة ضبط الجلسة</string>
+    <string name="settings_about">حول التطبيق</string>
+    <string name="settings_version">الإصدار %1$s</string>
+    <string name="clear">مسح</string>
+
+    <string name="player_loading_sources">جارٍ البحث عن المصادر…</string>
+    <string name="player_no_sources">لا توجد مصادر صالحة للتشغيل لهذه الحلقة.</string>
+    <string name="player_error">فشل التشغيل: %1$s</string>
+    <string name="player_next_source">جرّب المصدر التالي</string>
+    <string name="player_sources">المصادر</string>
+    <string name="player_subtitles">الترجمة</string>
+    <string name="player_audio">الصوت</string>
+    <string name="player_quality">الجودة</string>
+    <string name="player_speed">السرعة</string>
+    <string name="player_off">إيقاف</string>
+    <string name="player_auto">تلقائي</string>
+    <string name="player_next_episode">الحلقة التالية</string>
+    <string name="player_track">المسار %1$d</string>
+    <string name="player_close">إغلاق</string>
+</resources>

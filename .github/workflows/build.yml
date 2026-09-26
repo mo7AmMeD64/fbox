@@ -1,0 +1,61 @@
+name: Build Fkbox APK
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_B64: ${{ secrets.KEYSTORE_BASE64 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      # The player uses the prebuilt aniyomi mpv + ffmpeg AARs (they are not in the repo).
+      - name: Download player libraries
+        run: |
+          mkdir -p app/libs
+          curl -fL --retry 3 -o app/libs/aniyomi-mpv-lib.aar \
+            "https://github.com/jmir1/mpv-android/releases/download/1.18.n/aniyomi-mpv-lib-1.18.n.aar"
+          curl -fL --retry 3 -o app/libs/aniyomi-ffmpeg-kit.aar \
+            "https://github.com/jmir1/ffmpeg-kit/releases/download/1.18/aniyomi-ffmpeg-kit-1.18.aar"
+          ls -la app/libs
+
+      # Optional: sign with your own keystore instead of the bundled one.
+      - name: Use custom keystore
+        if: env.KEYSTORE_B64 != ''
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/custom.jks"
+          echo "FKBOX_KEYSTORE=$RUNNER_TEMP/custom.jks" >> "$GITHUB_ENV"
+          echo "FKBOX_KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "FKBOX_KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> "$GITHUB_ENV"
+          echo "FKBOX_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> "$GITHUB_ENV"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build signed release APK
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+
+      - name: Verify signature
+        run: |
+          APK=$(ls app/build/outputs/apk/release/*.apk | head -n 1)
+          "$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs "$APK" | head -n 5
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Fkbox-release-apk
+          path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
