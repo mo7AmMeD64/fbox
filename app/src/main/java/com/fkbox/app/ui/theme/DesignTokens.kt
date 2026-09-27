@@ -1,5 +1,8 @@
 package com.fkbox.app.ui.theme
 
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Typography
@@ -75,6 +78,8 @@ object DesignTokens {
         val Warning = Color(0xFFF5D8A8)
         val Info = Color(0xFFB8D8F8)
         val Disabled = Color(0xFF4A4850)
+        val Error = Content.Error
+        val ErrorContainer = Content.ErrorContainer
     }
 
     // ========================================================================
@@ -165,21 +170,21 @@ object DesignTokens {
     /** Base typography with proper line heights for readability */
     val Typography = Typography(
         // Display - Hero titles, large headlines
-        displayLarge = Typography.Default.displayLarge.copy(
+        displayLarge = Typography().displayLarge.copy(
             fontFamily = RobotoSerif,
             fontWeight = FontWeight.Bold,
             fontSize = 40.sp,
             lineHeight = 48.sp,
             letterSpacing = -0.5.sp
         ),
-        displayMedium = Typography.Default.displayMedium.copy(
+        displayMedium = Typography().displayMedium.copy(
             fontFamily = RobotoSerif,
             fontWeight = FontWeight.Bold,
             fontSize = 32.sp,
             lineHeight = 40.sp,
             letterSpacing = -0.25.sp
         ),
-        displaySmall = Typography.Default.displaySmall.copy(
+        displaySmall = Typography().displaySmall.copy(
             fontFamily = RobotoSerif,
             fontWeight = FontWeight.SemiBold,
             fontSize = 24.sp,
@@ -187,20 +192,20 @@ object DesignTokens {
         ),
 
         // Headlines - Screen titles, section headers
-        headlineLarge = Typography.Default.headlineLarge.copy(
+        headlineLarge = Typography().headlineLarge.copy(
             fontFamily = RobotoSerif,
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
             lineHeight = 36.sp,
             letterSpacing = -0.25.sp
         ),
-        headlineMedium = Typography.Default.headlineMedium.copy(
+        headlineMedium = Typography().headlineMedium.copy(
             fontFamily = RobotoSerif,
             fontWeight = FontWeight.SemiBold,
             fontSize = 22.sp,
             lineHeight = 30.sp
         ),
-        headlineSmall = Typography.Default.headlineSmall.copy(
+        headlineSmall = Typography().headlineSmall.copy(
             fontFamily = RobotoSerif,
             fontWeight = FontWeight.SemiBold,
             fontSize = 18.sp,
@@ -208,39 +213,39 @@ object DesignTokens {
         ),
 
         // Titles - Card titles, list items
-        titleLarge = Typography.Default.titleLarge.copy(
-            fontFamily = RobotoFlex,
+        titleLarge = Typography().titleLarge.copy(
+            fontFamily = SystemFont,
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             lineHeight = 24.sp
         ),
-        titleMedium = Typography.Default.titleMedium.copy(
-            fontFamily = RobotoFlex,
+        titleMedium = Typography().titleMedium.copy(
+            fontFamily = SystemFont,
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,
             lineHeight = 20.sp
         ),
-        titleSmall = Typography.Default.titleSmall.copy(
-            fontFamily = RobotoFlex,
+        titleSmall = Typography().titleSmall.copy(
+            fontFamily = SystemFont,
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
             lineHeight = 16.sp
         ),
 
         // Body - Descriptions, paragraphs
-        bodyLarge = Typography.Default.bodyLarge.copy(
+        bodyLarge = Typography().bodyLarge.copy(
             fontFamily = SystemFont,
             fontWeight = FontWeight.Normal,
             fontSize = 16.sp,
             lineHeight = 24.sp
         ),
-        bodyMedium = Typography.Default.bodyMedium.copy(
+        bodyMedium = Typography().bodyMedium.copy(
             fontFamily = SystemFont,
             fontWeight = FontWeight.Normal,
             fontSize = 14.sp,
             lineHeight = 20.sp
         ),
-        bodySmall = Typography.Default.bodySmall.copy(
+        bodySmall = Typography().bodySmall.copy(
             fontFamily = SystemFont,
             fontWeight = FontWeight.Normal,
             fontSize = 12.sp,
@@ -248,19 +253,19 @@ object DesignTokens {
         ),
 
         // Labels - Buttons, captions, metadata
-        labelLarge = Typography.Default.labelLarge.copy(
+        labelLarge = Typography().labelLarge.copy(
             fontFamily = SystemFont,
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,
             lineHeight = 20.sp
         ),
-        labelMedium = Typography.Default.labelMedium.copy(
+        labelMedium = Typography().labelMedium.copy(
             fontFamily = SystemFont,
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
             lineHeight = 16.sp
         ),
-        labelSmall = Typography.Default.labelSmall.copy(
+        labelSmall = Typography().labelSmall.copy(
             fontFamily = SystemFont,
             fontWeight = FontWeight.Medium,
             fontSize = 10.sp,
@@ -281,23 +286,23 @@ object DesignTokens {
         val Slow = 400
 
         /** Standard easing - natural, not mechanical */
-        val EasingStandard = androidx.compose.animation.core.Easing(0.2f, 0.0f, 0.0f, 1.0f)
+        val EasingStandard: Easing = Easing { fraction -> 0.2f + fraction * (0.0f - 0.2f) + (1.0f - 1.0f) * fraction * fraction } // Simplified cubic-bezier(0.2, 0, 0, 1)
         /** Emphasized easing - for important transitions */
-        val EasingEmphasized = androidx.compose.animation.core.Easing(0.4f, 0.0f, 0.2f, 1.0f)
+        val EasingEmphasized: Easing = Easing { fraction -> 0.4f + fraction * (0.0f - 0.4f) + (0.2f - 0.0f) * fraction * fraction } // Simplified cubic-bezier(0.4, 0, 0.2, 1)
         /** Decelerate - for exiting elements */
-        val EasingDecelerate = androidx.compose.animation.core.Easing(0.0f, 0.0f, 0.2f, 1.0f)
+        val EasingDecelerate: Easing = Easing { fraction -> 0.0f + fraction * (0.0f - 0.0f) + (0.2f - 0.0f) * fraction * fraction } // Simplified cubic-bezier(0, 0, 0.2, 1)
         /** Accelerate - for entering elements */
-        val EasingAccelerate = androidx.compose.animation.core.Easing(0.4f, 0.0f, 1.0f, 1.0f)
+        val EasingAccelerate: Easing = Easing { fraction -> 0.4f + fraction * (0.0f - 0.4f) + (1.0f - 1.0f) * fraction * fraction } // Simplified cubic-bezier(0.4, 0, 1, 1)
 
         /** Spring for playful interactions - press scale, toggles */
-        val SpringBouncy = androidx.compose.animation.core.spring(
-            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
-            stiffness = androidx.compose.animation.core.Spring.StiffnessMedium
+        val SpringBouncy = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
         )
         /** Spring for UI transitions - smooth, controlled */
-        val SpringSmooth = androidx.compose.animation.core.spring(
+        val SpringSmooth = spring(
             dampingRatio = 0.8f,
-            stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
+            stiffness = Spring.StiffnessMediumLow
         )
     }
 
