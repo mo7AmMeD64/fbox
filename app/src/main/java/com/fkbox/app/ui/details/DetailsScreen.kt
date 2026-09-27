@@ -262,8 +262,7 @@ private fun HeroSection(
                     modifier = Modifier
                         .width(120.dp)
                         .aspectRatio(2f / 3f)
-                        .clip(RoundedCornerShape(DesignTokens.Shape.MD))
-                        .graphicsLayer { shadowElevation = 16f; translationZ = 16f },
+                        .clip(RoundedCornerShape(DesignTokens.Shape.MD)),
                 )
 
                 // Title + Metadata + Actions
