@@ -13,8 +13,8 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.LibraryAdd
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
@@ -51,16 +51,16 @@ import com.fkbox.app.ui.common.pressScale
 import com.fkbox.app.ui.details.DetailsScreen
 import com.fkbox.app.ui.details.PlayRequest
 import com.fkbox.app.ui.home.HomeScreen
-import com.fkbox.app.ui.saved.SavedScreen
+import com.fkbox.app.ui.library.LibraryScreen
 import com.fkbox.app.ui.search.SearchScreen
 import com.fkbox.app.ui.settings.SettingsScreen
 import kotlinx.coroutines.launch
 
 private enum class Tab(val route: String, @StringRes val label: Int, val icon: ImageVector) {
-    Settings("settings", R.string.nav_settings, Icons.Rounded.Settings),
-    Saved("saved", R.string.nav_saved, Icons.Rounded.Favorite),
-    Search("search", R.string.nav_search, Icons.Rounded.Search),
     Home("home", R.string.nav_home, Icons.Rounded.Home),
+    Search("search", R.string.nav_search, Icons.Rounded.Search),
+    Library("library", R.string.library, Icons.Rounded.LibraryAdd),
+    Settings("settings", R.string.nav_settings, Icons.Rounded.Settings),
 }
 
 private const val ROUTE_SEARCH = "search?query={query}"
@@ -98,7 +98,7 @@ fun FkboxRoot(onPlay: (PlayRequest) -> Unit) {
 
     CompositionLocalProvider(LocalSnack provides snack) {
         Scaffold(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.background,
             snackbarHost = {
                 SnackbarHost(snackbar) { data -> Snackbar(data, shape = RoundedCornerShape(20.dp)) }
             },
@@ -131,14 +131,14 @@ fun FkboxRoot(onPlay: (PlayRequest) -> Unit) {
                         },
                     )
                 }
-                composable(Tab.Saved.route) {
-                    SavedScreen(contentPadding = padding, onOpen = { id -> nav.navigate("details/${Uri.encode(id)}") })
-                }
                 composable(
                     route = ROUTE_SEARCH,
                     arguments = listOf(navArgument("query") { type = NavType.StringType; defaultValue = "" }),
                 ) {
                     SearchScreen(contentPadding = padding, onOpen = { id -> nav.navigate("details/${Uri.encode(id)}") })
+                }
+                composable(Tab.Library.route) {
+                    LibraryScreen(contentPadding = padding, onOpen = { id -> nav.navigate("details/${Uri.encode(id)}") })
                 }
                 composable(Tab.Settings.route) { SettingsScreen(contentPadding = padding) }
                 composable(

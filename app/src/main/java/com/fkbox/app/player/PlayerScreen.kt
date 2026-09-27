@@ -2,8 +2,15 @@ package com.fkbox.app.player
 
 import android.view.LayoutInflater
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -18,8 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -47,7 +52,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -93,7 +97,7 @@ fun PlayerScreen(
         else -> req.title
     }
 
-    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim)) {
+    Box(Modifier.fillMaxSize().background(com.fkbox.app.ui.theme.DesignTokens.Surface.Background)) {
         if (vm.links.isNotEmpty()) {
             PlayerContent(
                 links = vm.links,
@@ -114,8 +118,11 @@ fun PlayerScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                CircularProgressIndicator()
-                Spacer(Modifier.size(12.dp))
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 4.dp,
+                )
+                Spacer(Modifier.size(16.dp))
                 Text(
                     stringResource(R.string.player_loading_sources),
                     color = MaterialTheme.colorScheme.onSurface,
@@ -124,7 +131,7 @@ fun PlayerScreen(
             }
             vm.error != null && vm.links.isEmpty() -> Column(
                 Modifier.fillMaxSize().padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
@@ -196,7 +203,7 @@ private fun PlayerContent(
     // Auto-hide the controls while playing.
     LaunchedEffect(visible, state.paused, tick, sheet) {
         if (visible && !state.paused && sheet == null) {
-            delay(3500)
+            delay(3000)
             visible = false
         }
     }
@@ -245,10 +252,19 @@ private fun PlayerContent(
         )
 
         if (state.buffering && state.error == null) {
-            Box(Modifier.align(Alignment.Center)) { CircularProgressIndicator() }
+            Box(Modifier.align(Alignment.Center)) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 4.dp,
+                )
+            }
         }
 
-        AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(animationSpec = com.fkbox.app.ui.theme.DesignTokens.Motion.SpringSmooth),
+            exit = fadeOut(animationSpec = com.fkbox.app.ui.theme.DesignTokens.Motion.SpringSmooth),
+        ) {
             Controls(
                 title = title,
                 state = state,
@@ -264,10 +280,10 @@ private fun PlayerContent(
             Column(
                 Modifier
                     .align(Alignment.Center)
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.shapes.extraLarge)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest, com.fkbox.app.ui.theme.DesignTokens.Shape.XL)
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Text(
                     stringResource(R.string.player_error, err),
@@ -314,7 +330,6 @@ private fun Controls(
         Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f))
-            .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 24.dp, vertical = 12.dp),
     ) {
@@ -399,6 +414,11 @@ private fun Controls(
                 },
                 valueRange = 0f..max,
                 modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+                colors = androidx.compose.material3.SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                ),
             )
             Text(
                 formatTime(state.duration),
@@ -426,7 +446,7 @@ private fun PickerSheet(
     onSelectSource: (Int) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val off = stringResource(R.string.player_off)
     val auto = stringResource(R.string.player_auto)
 
@@ -473,34 +493,40 @@ private fun PickerSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        sheetShape = com.fkbox.app.ui.theme.DesignTokens.Shape.XL,
     ) {
-        Text(
-            text = when (type) {
-                Sheet.SOURCES -> stringResource(R.string.player_sources)
-                Sheet.SUBTITLES -> stringResource(R.string.player_subtitles)
-                Sheet.AUDIO -> stringResource(R.string.player_audio)
-                Sheet.QUALITY -> stringResource(R.string.player_quality)
-                Sheet.SPEED -> stringResource(R.string.player_speed)
-            },
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-        )
-        LazyColumn(Modifier.navigationBarsPadding()) {
-            items(rows) { row ->
-                ListItem(
-                    headlineContent = { Text(row.label) },
-                    trailingContent = {
-                        if (row.selected) Icon(Icons.Rounded.Check, null, tint = MaterialTheme.colorScheme.primary)
-                        else Spacer(Modifier.width(24.dp))
-                    },
-                    colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
-                    modifier = Modifier.clickable {
-                        row.action()
-                        if (type == Sheet.SUBTITLES || type == Sheet.AUDIO || type == Sheet.QUALITY) controller.refreshTracks()
-                        onDismiss()
-                    },
-                )
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = when (type) {
+                    Sheet.SOURCES -> stringResource(R.string.player_sources)
+                    Sheet.SUBTITLES -> stringResource(R.string.player_subtitles)
+                    Sheet.AUDIO -> stringResource(R.string.player_audio)
+                    Sheet.QUALITY -> stringResource(R.string.player_quality)
+                    Sheet.SPEED -> stringResource(R.string.player_speed)
+                },
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp).fillMaxWidth(),
+            )
+            LazyColumn(Modifier.navigationBarsPadding()) {
+                items(rows) { row ->
+                    ListItem(
+                        headlineContent = { Text(row.label) },
+                        trailingContent = {
+                            if (row.selected) Icon(Icons.Rounded.Check, null, tint = MaterialTheme.colorScheme.primary)
+                            else Spacer(Modifier.width(24.dp))
+                        },
+                        colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                row.action()
+                                if (type == Sheet.SUBTITLES || type == Sheet.AUDIO || type == Sheet.QUALITY) controller.refreshTracks()
+                                onDismiss()
+                            }
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
+                }
             }
         }
     }
