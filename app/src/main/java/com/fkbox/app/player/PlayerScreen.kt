@@ -241,7 +241,8 @@ private fun PlayerContent(
                         onTap = { visible = !visible },
                         onDoubleTap = { offset ->
                             if (MpvGuard.alive) {
-                                val back = offset.x < size.width / 2f
+                                val boxWidth = this@Box.measuredWidth.toFloat()
+                                val back = offset.x < boxWidth / 2f
                                 MPVLib.command(arrayOf("seek", if (back) "-10" else "10", "relative"))
                             }
                             visible = true
