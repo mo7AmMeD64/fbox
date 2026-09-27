@@ -50,6 +50,7 @@ import com.fkbox.app.ui.common.LocalSnack
 import com.fkbox.app.ui.common.PrimaryButton
 import com.fkbox.app.ui.common.SectionHeader
 import com.fkbox.app.ui.theme.DesignTokens
+import com.fkbox.app.ui.common.pressScale
 
 @Composable
 fun SettingsScreen(contentPadding: PaddingValues) {

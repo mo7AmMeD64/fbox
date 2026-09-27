@@ -59,6 +59,7 @@ import com.fkbox.app.ui.common.PrimaryButton
 import com.fkbox.app.ui.common.RatingBadge
 import com.fkbox.app.ui.common.SectionHeader
 import com.fkbox.app.ui.common.WavyProgress
+import com.fkbox.app.ui.common.pressScale
 import com.fkbox.app.ui.theme.DesignTokens
 
 /** What the player needs to start an episode or a movie. */
@@ -493,7 +494,7 @@ private fun EpisodesSection(
                             selected = s.season == vm.selectedSeason,
                             onClick = { vm.selectedSeason = s.season },
                             label = { Text(stringResource(R.string.season_n, s.season)) },
-                            shape = com.fkbox.app.ui.theme.DesignTokens.Shape.Pill,
+                            shape = DesignTokens.Shape.Pill,
                         )
                     }
                 }

@@ -493,7 +493,6 @@ private fun PickerSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        sheetShape = com.fkbox.app.ui.theme.DesignTokens.Shape.XL,
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(

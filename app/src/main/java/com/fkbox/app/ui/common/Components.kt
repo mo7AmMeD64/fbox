@@ -10,7 +10,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.InteractionSource
@@ -49,7 +48,6 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -126,7 +124,7 @@ fun Modifier.clickableScale(
     val source = remember { MutableInteractionSource() }
     return this
         .pressScale(source)
-        .clickable(enabled = enabled, interactionSource = source, indication = LocalIndication.current, onClick = onClick)
+        .clickable(enabled = enabled, interactionSource = source, indication = null, onClick = onClick)
 }
 
 /** Standard screen horizontal padding */
@@ -971,7 +969,7 @@ fun OutlinedButton(
             .height(56.dp)
             .fillMaxWidth(),
         shape = DesignTokens.Shape.MD,
-        colors = OutlinedButtonDefaults.outlinedButtonColors(
+        colors = androidx.compose.material3.OutlinedButtonDefaults.outlinedButtonColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentColor = MaterialTheme.colorScheme.primary,
             borderColor = MaterialTheme.colorScheme.primary,
