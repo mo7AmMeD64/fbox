@@ -29,7 +29,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -140,7 +139,7 @@ private fun LoadingState(contentPadding: PaddingValues, onBack: () -> Unit) {
         Box {
             BackdropImage(
                 url = null,
-                modifier = Modifier.fillMaxWidth().aspectRatio(360f / 208f).clip(RoundedCornerShape(DesignTokens.Shape.LG.cornerSize(DesignTokens.Size.TouchTarget).x)),
+                modifier = Modifier.fillMaxWidth().aspectRatio(360f / 208f).clip(RoundedCornerShape(DesignTokens.Shape.LG)),
             )
             BackButton(onBack, Modifier.padding(8.dp))
         }
@@ -262,7 +261,7 @@ private fun HeroSection(
                     modifier = Modifier
                         .width(120.dp)
                         .aspectRatio(2f / 3f)
-                        .clip(RoundedCornerShape(DesignTokens.Shape.MD.cornerSize(DesignTokens.Size.TouchTarget).x))
+                        .clip(RoundedCornerShape(DesignTokens.Shape.MD))
                         .graphicsLayer { shadowElevation = 16f },
                 )
 

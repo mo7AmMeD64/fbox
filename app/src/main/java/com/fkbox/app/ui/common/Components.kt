@@ -277,7 +277,7 @@ fun CoverImage(
     Box(
         modifier = modifier
             .aspectRatio(aspectRatio)
-            .clip(RoundedCornerShape(DesignTokens.Shape.MD.cornerSize(DesignTokens.Size.TouchTarget).x))
+            .clip(RoundedCornerShape(DesignTokens.Shape.MD))
             .background(MaterialTheme.colorScheme.surfaceContainerHighest),
         contentAlignment = Alignment.Center,
     ) {
@@ -352,7 +352,7 @@ fun BackdropImage(
                     .fillMaxSize()
                     .background(
                         brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            colors = DesignTokens.Gradients.HeroOverlay.map { (color, stop) -> color.copy(alpha = stop) to stop }
+                            colors = DesignTokens.Gradients.HeroOverlay.map { (color, _) -> color }
                         )
                     )
             )
@@ -435,7 +435,6 @@ fun PosterCard(
     modifier: Modifier = Modifier,
     trailing: (@Composable () -> Unit)? = null,
     showRating: Boolean = true,
-    animate: Boolean = true,
 ) {
     val source = remember { MutableInteractionSource() }
     val isPressed by source.collectIsPressedAsState()
@@ -444,8 +443,7 @@ fun PosterCard(
         onClick = onClick,
         enabled = true,
         modifier = modifier
-            .pressScale(source, if (isPressed) 0.94f else 0.96f)
-            .animateItemPlacement(),
+            .pressScale(source, if (isPressed) 0.94f else 0.96f),
         shape = DesignTokens.Shape.MD,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -531,8 +529,7 @@ fun HorizontalPosterCard(
     Card(
         onClick = onClick,
         modifier = modifier
-            .pressScale(source, if (isPressed) 0.96f else 0.98f)
-            .animateItemPlacement(),
+            .pressScale(source, if (isPressed) 0.96f else 0.98f),
         shape = DesignTokens.Shape.MD,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -621,7 +618,7 @@ fun FeaturedHeroCard(
                     .fillMaxSize()
                     .background(
                         brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            colors = DesignTokens.Gradients.HeroOverlay.map { (color, stop) -> color.copy(alpha = stop) to stop }
+                            colors = DesignTokens.Gradients.HeroOverlay.map { (color, _) -> color }
                         )
                     )
             )
@@ -966,7 +963,7 @@ fun OutlinedButton(
     enabled: Boolean = true,
 ) {
     val source = remember { MutableInteractionSource() }
-    androidx.compose.material3.OutlinedButton(
+    OutlinedButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier
@@ -974,7 +971,7 @@ fun OutlinedButton(
             .height(56.dp)
             .fillMaxWidth(),
         shape = DesignTokens.Shape.MD,
-        colors = androidx.compose.material3.OutlinedButtonDefaults.outlinedButtonColors(
+        colors = OutlinedButtonDefaults.outlinedButtonColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentColor = MaterialTheme.colorScheme.primary,
             borderColor = MaterialTheme.colorScheme.primary,
@@ -1031,16 +1028,6 @@ fun LoadingBlock(
             )
         }
     }
-}
-
-/** Indeterminate circular progress with 4dp round-capped strokes. */
-@Composable
-fun WavyProgress(modifier: Modifier = Modifier) {
-    CircularProgressIndicator(
-        modifier = modifier,
-        strokeWidth = 4.dp,
-        color = MaterialTheme.colorScheme.primary,
-    )
 }
 
 /** Empty state with icon, title, description, and optional action */
@@ -1128,6 +1115,16 @@ fun ErrorState(
             )
         }
     }
+}
+
+/** Indeterminate circular progress with 4dp round-capped strokes. */
+@Composable
+fun WavyProgress(modifier: Modifier = Modifier) {
+    CircularProgressIndicator(
+        modifier = modifier,
+        strokeWidth = 4.dp,
+        color = MaterialTheme.colorScheme.primary,
+    )
 }
 
 // ========================================================================

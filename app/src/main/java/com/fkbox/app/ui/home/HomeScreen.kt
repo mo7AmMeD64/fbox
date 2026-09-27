@@ -41,9 +41,13 @@ import com.fkbox.app.ui.common.FeaturedHeroCard
 import com.fkbox.app.ui.common.Heading
 import com.fkbox.app.ui.common.HorizontalPosterCard
 import com.fkbox.app.ui.common.PosterCard
+import com.fkbox.app.ui.common.PrimaryButton
+import com.fkbox.app.ui.common.RatingBadge
 import com.fkbox.app.ui.common.SectionHeader
 import com.fkbox.app.ui.common.SkeletonPoster
-
+import com.fkbox.app.ui.common.FilterChip
+import com.fkbox.app.ui.common.Icon
+import com.fkbox.app.ui.common.IconButton
 
 @Composable
 fun HomeScreen(
@@ -291,7 +295,7 @@ private fun ContentSection(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                items(6) {
+                items(6) { 
                     SkeletonPoster(modifier = Modifier.width(150.dp))
                 }
             }
@@ -332,7 +336,7 @@ private fun GenresSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(genres, key = { it.label }) { genre ->
-                com.fkbox.app.ui.common.FilterChip(
+                FilterChip(
                     label = genre.label,
                     selected = selectedGenre?.label == genre.label,
                     onClick = { onGenreClick(genre) },
@@ -383,11 +387,11 @@ fun HomeSearchField(onSearch: (String) -> Unit) {
         singleLine = true,
         shape = CircleShape,
         placeholder = { Text(stringResource(R.string.search)) },
-        leadingIcon = { androidx.compose.material3.Icon(Icons.Rounded.Search, null) },
+        leadingIcon = { Icon(Icons.Rounded.Search, null) },
         trailingIcon = {
             if (query.isNotEmpty()) {
-                androidx.compose.material3.IconButton(onClick = { query = "" }) {
-                    androidx.compose.material3.Icon(Icons.Rounded.Close, null)
+                IconButton(onClick = { query = "" }) {
+                    Icon(Icons.Rounded.Close, null)
                 }
             }
         },
@@ -422,7 +426,7 @@ fun GenreDropdown(vm: HomeViewModel) {
             singleLine = true,
             shape = CircleShape,
             label = { Text(stringResource(R.string.genres)) },
-            leadingIcon = { androidx.compose.material3.Icon(Icons.Rounded.PlayCircle, null) },
+            leadingIcon = { Icon(Icons.Rounded.PlayCircle, null) },
             trailingIcon = { androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor(androidx.compose.material3.ExposedDropdownMenuAnchorType.PrimaryNotEditable)

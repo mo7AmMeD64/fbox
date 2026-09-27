@@ -50,6 +50,7 @@ import com.fkbox.app.ui.common.LoadingBlock
 import com.fkbox.app.ui.common.PosterCard
 import com.fkbox.app.ui.common.SectionHeader
 import com.fkbox.app.ui.common.SkeletonPoster
+import com.fkbox.app.ui.common.pressScale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

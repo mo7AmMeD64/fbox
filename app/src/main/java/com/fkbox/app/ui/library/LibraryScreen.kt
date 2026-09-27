@@ -39,7 +39,6 @@ import com.fkbox.app.ui.common.HorizontalPosterCard
 import com.fkbox.app.ui.common.LoadingBlock
 import com.fkbox.app.ui.common.PosterCard
 import com.fkbox.app.ui.common.SectionHeader
-import com.fkbox.app.ui.common.SkeletonHorizontalPoster
 
 @Composable
 fun LibraryScreen(contentPadding: PaddingValues, onOpen: (String) -> Unit) {
@@ -153,7 +152,7 @@ private fun ContinueWatchingTab(onOpen: (String) -> Unit) {
             modifier = Modifier.fillMaxSize(),
         )
     } else {
-        androidx.compose.foundation.lazy.LazyRow(
+        LazyRow(
             modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
