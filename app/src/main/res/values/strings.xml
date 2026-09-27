@@ -100,7 +100,6 @@
     <string name="video">Video</string>
     <string name="network">Network</string>
     <string name="storage">Storage</string>
-    <string name="about">About</string>
     <string name="general">General</string>
     <string name="theme">Theme</string>
     <string name="language">Language</string>
@@ -128,12 +127,9 @@
     <string name="try_again">Try Again</string>
     <string name="episode">Episode</string>
     <string name="season">Season</string>
-    <string name="play">Play</string>
     <string name="resume">Resume</string>
     <string name="remove_from_favorites">Remove from Favorites</string>
     <string name="add_to_favorites">Add to Favorites</string>
     <string name="mark_as_watched">Mark as Watched</string>
     <string name="clear_watch_history">Clear Watch History</string>
-    <string name="settings_reset_token_done">Session reset</string>
-    <string name="settings_clear_saved_done">Saved list cleared</string>
 </resources>
