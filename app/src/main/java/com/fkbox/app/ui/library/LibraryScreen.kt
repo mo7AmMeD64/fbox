@@ -54,15 +54,13 @@ fun LibraryScreen(contentPadding: PaddingValues, onOpen: (String) -> Unit) {
                 selectedTabIndex = selectedTab.index,
                 modifier = Modifier.fillMaxWidth(),
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                indicatorColor = MaterialTheme.colorScheme.primary,
-                dividerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f),
             ) {
                 LibraryTab.entries.forEach { tab ->
                     Tab(
                         selected = selectedTab == tab,
                         onClick = { selectedTab = tab },
                         text = { Text(stringResource(tab.label), style = MaterialTheme.typography.labelLarge) },
-                        icon = { Icon(tab.icon, contentDescription = null) },
+                        icon = { androidx.compose.material3.Icon(tab.icon, contentDescription = null) },
                     )
                 }
             }

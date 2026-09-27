@@ -46,8 +46,8 @@ import com.fkbox.app.ui.common.RatingBadge
 import com.fkbox.app.ui.common.SectionHeader
 import com.fkbox.app.ui.common.SkeletonPoster
 import com.fkbox.app.ui.common.FilterChip
-import com.fkbox.app.ui.common.Icon
-import com.fkbox.app.ui.common.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 @Composable
 fun HomeScreen(
