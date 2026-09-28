@@ -326,7 +326,7 @@ private fun HeroSection(
                         FavoriteButton(
                             saved = isFavorite,
                             onClick = onFavorite,
-                            size = 28,
+                            size = 28.dp,
                         )
                     }
                 }
