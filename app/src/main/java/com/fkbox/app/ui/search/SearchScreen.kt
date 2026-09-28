@@ -177,8 +177,7 @@ fun SearchScreen(
                     vm.submit()
                     keyboard?.hide()
                 }),
-                colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),

@@ -295,12 +295,12 @@ object DesignTokens {
         val EasingAccelerate: Easing = Easing { fraction -> 0.4f + fraction * (0.0f - 0.4f) + (1.0f - 1.0f) * fraction * fraction } // Simplified cubic-bezier(0.4, 0, 1, 1)
 
         /** Spring for playful interactions - press scale, toggles */
-        val SpringBouncy = spring(
+        val SpringBouncy = spring<Float>(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
         )
         /** Spring for UI transitions - smooth, controlled */
-        val SpringSmooth = spring(
+        val SpringSmooth = spring<Float>(
             dampingRatio = 0.8f,
             stiffness = Spring.StiffnessMediumLow
         )

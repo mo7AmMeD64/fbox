@@ -27,10 +27,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BrokenImage
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
@@ -60,6 +63,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -69,9 +73,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import com.fkbox.app.R
 import com.fkbox.app.data.moviebox.Item
 import com.fkbox.app.ui.theme.DesignTokens
@@ -275,18 +280,17 @@ fun CoverImage(
     Box(
         modifier = modifier
             .aspectRatio(aspectRatio)
-            .clip(RoundedCornerShape(DesignTokens.Shape.MD))
+            .clip(DesignTokens.Shape.MD)
             .background(MaterialTheme.colorScheme.surfaceContainerHighest),
         contentAlignment = Alignment.Center,
     ) {
         if (!url.isNullOrBlank()) {
-            AsyncImage(
+            SubcomposeAsyncImage(
                 model = url,
                 contentDescription = contentDescription,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
-                crossfade = crossfade,
-                placeholder = placeholder ?: {
+                loading = placeholder ?: {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
@@ -305,7 +309,7 @@ fun CoverImage(
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            Icons.Rounded.BrokenImage,
+                            Icons.Filled.BrokenImage,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
                             modifier = Modifier.size(DesignTokens.Size.IconXL),
@@ -445,7 +449,6 @@ fun PosterCard(
         shape = DesignTokens.Shape.MD,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         ),
         interactionSource = source,
     ) {
@@ -464,10 +467,8 @@ fun PosterCard(
                     .height(80.dp)
                     .background(
                         brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            listOf(
-                                Color.Transparent to 0.0f,
-                                MaterialTheme.colorScheme.scrim.copy(alpha = 0.7f) to 1.0f
-                            )
+                            0.0f to Color.Transparent,
+                            1.0f to MaterialTheme.colorScheme.scrim.copy(alpha = 0.7f),
                         )
                     )
             )
@@ -488,8 +489,7 @@ fun PosterCard(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(DesignTokens.Spacing.MD)
-                    .weight(1f),
+                    .padding(DesignTokens.Spacing.MD),
                 verticalArrangement = Arrangement.Bottom,
             ) {
                 Text(
@@ -531,7 +531,6 @@ fun HorizontalPosterCard(
         shape = DesignTokens.Shape.MD,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            pressedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         ),
         interactionSource = source,
     ) {
@@ -695,39 +694,18 @@ fun FeaturedHeroCard(
 
                     // Metadata row
                     Spacer(Modifier.height(DesignTokens.Spacing.MD))
-                    if (item.imdb != null || item.year != null || item.duration != null) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(DesignTokens.Spacing.LG),
-                        ) {
-                            item.imdb?.let {
-                                RatingBadge(rating = it, showIcon = true)
-                            }
-                            item.year?.let {
-                                Metadata(text = it.toString())
-                            }
-                            item.duration?.let {
-                                Metadata(text = it)
-                            }
-                            if (item.isSeries) {
-                                ContentTypeBadge(text = stringResource(R.string.type_series))
-                            } else {
-                                ContentTypeBadge(text = stringResource(R.string.type_movie))
-                            }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(DesignTokens.Spacing.LG),
+                    ) {
+                        item.imdb?.let {
+                            RatingBadge(rating = it, showIcon = true)
                         }
-                    }
-
-                    // Description
-                    item.description?.let { desc ->
-                        Spacer(Modifier.height(DesignTokens.Spacing.SM))
-                        Text(
-                            text = desc,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        if (item.isSeries) {
+                            ContentTypeBadge(text = stringResource(R.string.type_series))
+                        } else {
+                            ContentTypeBadge(text = stringResource(R.string.type_movie))
+                        }
                     }
                 }
             }
@@ -827,7 +805,7 @@ fun FavoriteButton(
     saved: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Int = DesignTokens.Size.IconMD,
+    size: Dp = DesignTokens.Size.IconMD,
 ) {
     val source = remember { MutableInteractionSource() }
     val scale by animateFloatAsState(
@@ -843,7 +821,7 @@ fun FavoriteButton(
             .graphicsLayer { scaleX = scale; scaleY = scale },
         interactionSource = source,
         shape = DesignTokens.Shape.Circle,
-        colors = androidx.compose.material3.FilledTonalButtonDefaults.filledTonalButtonColors(
+        colors = androidx.compose.material3.IconButtonDefaults.filledTonalIconButtonColors(
             containerColor = if (saved) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
             contentColor = if (saved) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
         ),
@@ -851,7 +829,7 @@ fun FavoriteButton(
         Icon(
             Icons.Rounded.Favorite,
             contentDescription = stringResource(if (saved) R.string.unsave else R.string.save),
-            modifier = Modifier.size(size.dp),
+            modifier = Modifier.size(size),
         )
     }
 }
@@ -969,13 +947,11 @@ fun OutlinedButton(
             .height(56.dp)
             .fillMaxWidth(),
         shape = DesignTokens.Shape.MD,
-        colors = androidx.compose.material3.OutlinedButtonDefaults.outlinedButtonColors(
+        colors = ButtonDefaults.outlinedButtonColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentColor = MaterialTheme.colorScheme.primary,
-            borderColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-            disabledBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f),
         ),
         interactionSource = source,
     ) {
@@ -1082,7 +1058,7 @@ fun ErrorState(
     message: String,
     modifier: Modifier = Modifier,
     onRetry: (() -> Unit)? = null,
-    icon: ImageVector = Icons.Rounded.CloudOff,
+    icon: ImageVector = Icons.Filled.CloudOff,
 ) {
     Column(
         modifier = modifier
@@ -1177,8 +1153,8 @@ fun FilterChip(
         colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
             containerColor = backgroundColor,
             selectedContainerColor = backgroundColor,
-            contentColor = contentColor,
-            selectedContentColor = contentColor,
+            labelColor = contentColor,
+            selectedLabelColor = contentColor,
         ),
         interactionSource = source,
         leadingIcon = leadingIcon?.let {

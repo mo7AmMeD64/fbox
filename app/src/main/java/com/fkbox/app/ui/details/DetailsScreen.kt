@@ -140,7 +140,7 @@ private fun LoadingState(contentPadding: PaddingValues, onBack: () -> Unit) {
         Box {
             BackdropImage(
                 url = null,
-                modifier = Modifier.fillMaxWidth().aspectRatio(360f / 208f).clip(RoundedCornerShape(DesignTokens.Shape.LG)),
+                modifier = Modifier.fillMaxWidth().aspectRatio(360f / 208f).clip(DesignTokens.Shape.LG),
             )
             BackButton(onBack, Modifier.padding(8.dp))
         }
@@ -262,7 +262,7 @@ private fun HeroSection(
                     modifier = Modifier
                         .width(120.dp)
                         .aspectRatio(2f / 3f)
-                        .clip(RoundedCornerShape(DesignTokens.Shape.MD)),
+                        .clip(DesignTokens.Shape.MD),
                 )
 
                 // Title + Metadata + Actions
@@ -505,7 +505,7 @@ private fun EpisodesSection(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    items((1..s.maxEpisode).toList(), key = { "s${s.season}e$it" }) { ep ->
+                    (1..s.maxEpisode).forEach { ep ->
                         EpisodeRow(
                             label = stringResource(R.string.episode_n, ep),
                             onClick = { onPlay(PlayRequest(details.id, details.title, s.season, ep, s.maxEpisode)) },
