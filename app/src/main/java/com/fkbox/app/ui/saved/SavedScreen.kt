@@ -23,9 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fkbox.app.R
 import com.fkbox.app.fkApp
-import com.fkbox.app.ui.common.EmptyState
 import com.fkbox.app.ui.common.FavoriteButton
 import com.fkbox.app.ui.common.LocalSnack
+import com.fkbox.app.ui.common.MessageState
 import com.fkbox.app.ui.common.PosterCard
 
 @Composable
@@ -36,13 +36,13 @@ fun SavedScreen(contentPadding: PaddingValues, onOpen: (String) -> Unit) {
     val removedLabel = stringResource(R.string.saved_removed, "%s")
     val undo = stringResource(R.string.undo)
 
-    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainerLow)) {
         if (saved.isEmpty()) {
-            EmptyState(
+            MessageState(
                 icon = Icons.Rounded.Favorite,
                 title = stringResource(R.string.saved_empty_title),
-                description = stringResource(R.string.saved_empty_body),
-                modifier = Modifier.fillMaxSize(),
+                body = stringResource(R.string.saved_empty_body),
+                modifier = Modifier.align(Alignment.Center),
             )
         } else {
             LazyVerticalGrid(

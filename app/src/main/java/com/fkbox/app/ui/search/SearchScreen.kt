@@ -45,11 +45,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fkbox.app.R
 import com.fkbox.app.data.moviebox.Item
 import com.fkbox.app.fkApp
-import com.fkbox.app.ui.common.EmptyState
 import com.fkbox.app.ui.common.LoadingBlock
+import com.fkbox.app.ui.common.MessageState
 import com.fkbox.app.ui.common.PosterCard
-import com.fkbox.app.ui.common.SectionHeader
-import com.fkbox.app.ui.common.SkeletonPoster
 import com.fkbox.app.ui.common.pressScale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -151,7 +149,7 @@ fun SearchScreen(
     val keyboard = LocalSoftwareKeyboardController.current
     LaunchedEffect(Unit) { if (vm.query.isBlank()) focus.requestFocus() }
 
-    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainerLow)) {
         Column(
             Modifier
                 .fillMaxSize()
@@ -177,30 +175,28 @@ fun SearchScreen(
                     vm.submit()
                     keyboard?.hide()
                 }),
-                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ),
             )
 
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 val bottom = contentPadding.calculateBottomPadding() + 16.dp
                 when {
-                    vm.loading && vm.results.isEmpty() -> LoadingBlock(Modifier.align(Alignment.Center))
-                    vm.error != null -> com.fkbox.app.ui.common.ErrorState(
-                        message = vm.error.orEmpty(),
-                        onRetry = vm::submit,
+                    vm.loading -> LoadingBlock(Modifier.align(Alignment.Center))
+                    vm.error != null -> MessageState(
+                        icon = Icons.Rounded.Search,
+                        title = stringResource(R.string.error_generic, vm.error.orEmpty()),
+                        actionLabel = stringResource(R.string.retry),
+                        onAction = vm::submit,
                         modifier = Modifier.align(Alignment.Center),
                     )
-                    vm.searchedFor == null -> EmptyState(
+                    vm.searchedFor == null -> MessageState(
                         icon = Icons.Rounded.Search,
                         title = stringResource(R.string.search_hint_idle),
-                        modifier = Modifier.align(Alignment.Center).fillMaxWidth(),
+                        modifier = Modifier.align(Alignment.Center),
                     )
-                    vm.results.isEmpty() -> EmptyState(
+                    vm.results.isEmpty() -> MessageState(
                         icon = Icons.Rounded.Search,
                         title = stringResource(R.string.search_no_results, vm.searchedFor.orEmpty()),
-                        modifier = Modifier.align(Alignment.Center).fillMaxWidth(),
+                        modifier = Modifier.align(Alignment.Center),
                     )
                     else -> LazyVerticalGrid(
                         columns = GridCells.Adaptive(150.dp),
@@ -220,9 +216,7 @@ fun SearchScreen(
                                         Button(
                                             onClick = vm::loadMore,
                                             interactionSource = src,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .pressScale(src),
+                                            modifier = Modifier.pressScale(src),
                                         ) { Text(stringResource(R.string.load_more)) }
                                     }
                                 }

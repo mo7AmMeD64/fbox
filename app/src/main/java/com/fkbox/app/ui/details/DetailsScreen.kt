@@ -24,11 +24,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.PlayCircle
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,20 +49,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fkbox.app.R
 import com.fkbox.app.data.moviebox.Details
-import com.fkbox.app.ui.common.BackdropImage
-import com.fkbox.app.ui.common.Body
 import com.fkbox.app.ui.common.CoverImage
-import com.fkbox.app.ui.common.EmptyState
 import com.fkbox.app.ui.common.FavoriteButton
 import com.fkbox.app.ui.common.Heading
-import com.fkbox.app.ui.common.Metadata
+import com.fkbox.app.ui.common.LocalSnack
+import com.fkbox.app.ui.common.MessageState
 import com.fkbox.app.ui.common.PosterCard
-import com.fkbox.app.ui.common.PrimaryButton
-import com.fkbox.app.ui.common.RatingBadge
-import com.fkbox.app.ui.common.SectionHeader
 import com.fkbox.app.ui.common.WavyProgress
 import com.fkbox.app.ui.common.pressScale
-import com.fkbox.app.ui.theme.DesignTokens
 
 /** What the player needs to start an episode or a movie. */
 data class PlayRequest(
@@ -80,7 +76,7 @@ fun DetailsScreen(
     vm: DetailsViewModel = viewModel(),
 ) {
     val saved by vm.isSaved.collectAsStateWithLifecycle()
-    val snack = com.fkbox.app.ui.common.LocalSnack.current
+    val snack = LocalSnack.current
     val undo = stringResource(R.string.undo)
     val addedFmt = stringResource(R.string.saved_added, "%s")
     val removedFmt = stringResource(R.string.saved_removed, "%s")
@@ -94,16 +90,18 @@ fun DetailsScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainerHigh)) {
         when (val ui = vm.ui) {
             is DetailsUi.Loading -> LoadingState(contentPadding, onBack)
             is DetailsUi.Error -> Column(Modifier.fillMaxSize()) {
                 Spacer(Modifier.height(contentPadding.calculateTopPadding() + 8.dp))
                 BackButton(onBack, Modifier.padding(start = 16.dp))
-                com.fkbox.app.ui.common.ErrorState(
-                    message = ui.message,
-                    onRetry = vm::load,
-                    modifier = Modifier.weight(1f).padding(16.dp),
+                MessageState(
+                    icon = Icons.Rounded.Search,
+                    title = stringResource(R.string.error_generic, ui.message),
+                    actionLabel = stringResource(R.string.retry),
+                    onAction = vm::load,
+                    modifier = Modifier.weight(1f),
                 )
             }
             is DetailsUi.Ready -> ReadyContent(
@@ -138,9 +136,9 @@ private fun LoadingState(contentPadding: PaddingValues, onBack: () -> Unit) {
             .padding(horizontal = 16.dp),
     ) {
         Box {
-            BackdropImage(
+            CoverImage(
                 url = null,
-                modifier = Modifier.fillMaxWidth().aspectRatio(360f / 208f).clip(DesignTokens.Shape.LG),
+                modifier = Modifier.fillMaxWidth().aspectRatio(360f / 208f).clip(RoundedCornerShape(32.dp)),
             )
             BackButton(onBack, Modifier.padding(8.dp))
         }
@@ -167,358 +165,211 @@ private fun ReadyContent(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
+            top = contentPadding.calculateTopPadding() + 8.dp,
             bottom = contentPadding.calculateBottomPadding() + 24.dp,
         ),
-        verticalArrangement = Arrangement.spacedBy(0.dp),
-    ) {
-        // Hero Section with Backdrop + Poster
-        item {
-            HeroSection(
-                details = d,
-                onBack = onBack,
-                onPlay = { onPlay(PlayRequest(d.id, d.title, 0, 0, 0)) },
-                onFavorite = onToggleSaved,
-                isFavorite = saved,
-            )
-        }
-
-        // About Section
-        item {
-            AboutSection(details = d)
-        }
-
-        // Cast Section
-        if (d.actors.isNotEmpty()) {
-            item {
-                CastSection(actors = d.actors)
-            }
-        }
-
-        // Episodes / Seasons Section
-        item {
-            EpisodesSection(
-                details = d,
-                vm = vm,
-                onPlay = onPlay,
-            )
-        }
-
-        // Recommendations
-        if (vm.recommendations.isNotEmpty()) {
-            item {
-                RecommendationsSection(
-                    recommendations = vm.recommendations,
-                    onOpen = onOpen,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun HeroSection(
-    details: Details,
-    onBack: () -> Unit,
-    onPlay: () -> Unit,
-    onFavorite: () -> Unit,
-    isFavorite: Boolean,
-) {
-    Box(modifier = Modifier.fillMaxWidth()) {
-        // Backdrop
-        BackdropImage(
-            url = details.posterUrl,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f),
-            overlay = true,
-        )
-
-        // Back button overlay
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp, 16.dp, 16.dp, 0.dp),
-            contentAlignment = Alignment.TopStart,
-        ) {
-            BackButton(onBack)
-        }
-
-        // Poster + Metadata + Actions
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Bottom,
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                // Poster
-                CoverImage(
-                    url = details.posterUrl,
-                    contentDescription = details.title,
-                    modifier = Modifier
-                        .width(120.dp)
-                        .aspectRatio(2f / 3f)
-                        .clip(DesignTokens.Shape.MD),
-                )
-
-                // Title + Metadata + Actions
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(bottom = 24.dp),
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.Start,
-                ) {
-                    // Title & Rating
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        Text(
-                            text = details.title,
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        details.imdb?.let {
-                            RatingBadge(rating = it, size = 18)
-                        }
-                    }
-
-                    // Metadata chips
-                    Spacer(Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        details.year?.let { Metadata(text = it.toString()) }
-                        details.duration?.let { Metadata(text = it) }
-                        details.genres.take(3).joinToString(" • ").let { if (it.isNotBlank()) Metadata(text = it) }
-                        com.fkbox.app.ui.common.ContentTypeBadge(
-                            text = stringResource(if (details.isSeries) R.string.type_series else R.string.type_movie),
-                        )
-                    }
-
-                    // Action buttons
-                    Spacer(Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        PrimaryButton(
-                            text = stringResource(if (details.isSeries) R.string.play else R.string.play_movie),
-                            onClick = onPlay,
-                            icon = Icons.Rounded.PlayArrow,
-                            modifier = Modifier.weight(1f),
-                        )
-                        com.fkbox.app.ui.common.SecondaryButton(
-                            text = stringResource(R.string.more_details),
-                            onClick = { /* Already on details */ },
-                            icon = Icons.Rounded.PlayCircle,
-                            modifier = Modifier.weight(1f),
-                        )
-                        FavoriteButton(
-                            saved = isFavorite,
-                            onClick = onFavorite,
-                            size = 28.dp,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AboutSection(details: Details) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Heading(text = stringResource(R.string.about), style = "headlineMedium")
-
-        Body(
-            text = details.description ?: stringResource(R.string.no_story),
-            style = "bodyLarge",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        if (details.dubs.isNotEmpty()) {
-            Body(
-                text = stringResource(R.string.available_audio, details.dubs.joinToString(", ") { it.language }),
-                style = "bodySmall",
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-            )
-        }
-
-        // Metadata grid
-        MetadataGrid(details = details)
-    }
-}
-
-@Composable
-private fun MetadataGrid(details: Details) {
-    val metadata = mutableListOf<Pair<String, String>>()
-    details.year?.let { metadata.add("Year" to it.toString()) }
-    details.duration?.let { metadata.add("Runtime" to it) }
-    details.country?.let { metadata.add("Country" to it) }
-    details.language?.let { metadata.add("Language" to it) }
-    details.genres.takeIf { it.isNotEmpty() }?.joinToString(", ")?.let { metadata.add("Genres" to it) }
-
-    if (metadata.isEmpty()) return
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            metadata.forEachIndexed { index, (label, value) ->
-                Column(
-                    modifier = Modifier.weight(1f).fillMaxWidth(),
-                    horizontalAlignment = Alignment.Start,
-                ) {
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = value,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
+        // Hero image (360x208 ratio) with back + save buttons on top.
+        item {
+            Box(Modifier.padding(horizontal = 16.dp)) {
+                CoverImage(
+                    url = d.posterUrl,
+                    contentDescription = d.title,
+                    modifier = Modifier.fillMaxWidth().aspectRatio(360f / 208f).clip(RoundedCornerShape(32.dp)),
+                )
+                BackButton(onBack, Modifier.align(Alignment.TopStart).padding(8.dp))
+                FavoriteButton(saved, onToggleSaved, Modifier.align(Alignment.TopEnd).padding(8.dp))
             }
         }
-    }
-}
 
-@Composable
-private fun CastSection(actors: List<com.fkbox.app.data.moviebox.Actor>) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        SectionHeader(title = stringResource(R.string.cast))
-
-        LazyRow(
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            items(actors.take(20), key = { it.name }) { actor ->
-                Column(
-                    modifier = Modifier.width(84.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CoverImage(
-                        url = actor.image,
-                        contentDescription = actor.name,
-                        modifier = Modifier
-                            .size(72.dp)
-                            .clip(CircleShape),
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = actor.name,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 2,
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    actor.character?.let { character ->
-                        Text(
-                            text = character,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            textAlign = TextAlign.Center,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
+        // Title + rating always share one centered row and never wrap.
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = d.title,
+                    modifier = Modifier.weight(1f, fill = false),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 28.sp,
+                    lineHeight = 36.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    text = d.imdb?.let { stringResource(R.string.imdb_rating, String.format("%.1f", it)) }
+                        ?: stringResource(R.string.imdb_unrated),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 28.sp,
+                    lineHeight = 36.sp,
+                    maxLines = 1,
+                    softWrap = false,
+                )
             }
         }
-    }
-}
 
-@Composable
-private fun EpisodesSection(
-    details: Details,
-    vm: DetailsViewModel,
-    onPlay: (PlayRequest) -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        if (!details.isSeries) {
-            // Movie - single play button
-            PrimaryButton(
-                text = stringResource(R.string.play_movie),
-                onClick = { onPlay(PlayRequest(details.id, details.title, 0, 0, 0)) },
-                icon = Icons.Rounded.PlayArrow,
-                modifier = Modifier.fillMaxWidth(),
+        item {
+            val meta = listOfNotNull(
+                d.year?.toString(),
+                d.duration,
+                d.country,
+                d.genres.takeIf { it.isNotEmpty() }?.joinToString(", "),
+            ).joinToString(" • ")
+            if (meta.isNotEmpty()) {
+                Text(
+                    meta,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        item { InsetDivider() }
+
+        item { Heading(stringResource(R.string.about), Modifier.fillMaxWidth().padding(horizontal = 16.dp), TextAlign.Center) }
+        item {
+            Text(
+                text = d.description ?: stringResource(R.string.no_story),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 26.sp,
             )
-        } else {
-            // Series - season selector + episodes
-            SectionHeader(title = stringResource(R.string.episodes))
+        }
+        if (d.dubs.isNotEmpty()) {
+            item {
+                Text(
+                    text = stringResource(R.string.available_audio, d.dubs.joinToString(", ") { it.language }),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
 
-            if (details.seasons.size > 1) {
-                // Season selector
+        if (d.actors.isNotEmpty()) {
+            item {
+                Text(
+                    stringResource(R.string.cast),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
+            item {
                 LazyRow(
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(details.seasons, key = { it.season }) { s ->
-                        FilterChip(
-                            selected = s.season == vm.selectedSeason,
-                            onClick = { vm.selectedSeason = s.season },
-                            label = { Text(stringResource(R.string.season_n, s.season)) },
-                            shape = DesignTokens.Shape.Pill,
-                        )
+                    items(d.actors.take(20)) { actor ->
+                        Column(Modifier.width(84.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                            CoverImage(actor.image, Modifier.size(72.dp).clip(CircleShape), actor.name)
+                            Text(
+                                actor.name,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 2,
+                                textAlign = TextAlign.Center,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(top = 6.dp),
+                            )
+                        }
                     }
                 }
             }
+        }
 
-            val season = details.seasons.firstOrNull { it.season == vm.selectedSeason } ?: details.seasons.firstOrNull()
-            season?.let { s ->
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+        item { InsetDivider() }
+
+        item { Heading(stringResource(R.string.episodes), Modifier.padding(horizontal = 16.dp)) }
+
+        if (!d.isSeries) {
+            item {
+                val src = remember { MutableInteractionSource() }
+                Button(
+                    onClick = { onPlay(PlayRequest(d.id, d.title, 0, 0, 0)) },
+                    interactionSource = src,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(56.dp).pressScale(src),
                 ) {
-                    (1..s.maxEpisode).forEach { ep ->
-                        EpisodeRow(
-                            label = stringResource(R.string.episode_n, ep),
-                            onClick = { onPlay(PlayRequest(details.id, details.title, s.season, ep, s.maxEpisode)) },
-                        )
+                    Icon(Icons.Rounded.PlayArrow, null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.play_movie))
+                }
+            }
+        } else if (season != null) {
+            if (d.seasons.size > 1) {
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(d.seasons, key = { it.season }) { s ->
+                            FilterChip(
+                                selected = s.season == season.season,
+                                onClick = { vm.selectedSeason = s.season },
+                                label = { Text(stringResource(R.string.season_n, s.season)) },
+                                shape = CircleShape,
+                            )
+                        }
                     }
                 }
-            } ?: EmptyState(
-                icon = Icons.Rounded.PlayCircle,
-                title = stringResource(R.string.nothing_here),
-                modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-            )
+            }
+            items((1..season.maxEpisode).toList(), key = { "s${season.season}e$it" }) { ep ->
+                EpisodeRow(
+                    label = stringResource(R.string.episode_n, ep),
+                    onClick = { onPlay(PlayRequest(d.id, d.title, season.season, ep, season.maxEpisode)) },
+                )
+            }
+        } else {
+            item {
+                Text(
+                    stringResource(R.string.nothing_here),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
+        }
+
+        if (vm.recommendations.isNotEmpty()) {
+            item { InsetDivider() }
+            item {
+                Text(
+                    stringResource(R.string.more_like_this),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
+            item {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    items(vm.recommendations, key = { it.id }) { r ->
+                        PosterCard(item = r, onClick = { onOpen(r.id) }, modifier = Modifier.width(150.dp))
+                    }
+                }
+            }
         }
     }
+}
+
+@Composable
+private fun InsetDivider() {
+    HorizontalDivider(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        thickness = 1.dp,
+        color = MaterialTheme.colorScheme.outlineVariant,
+    )
 }
 
 @Composable
@@ -526,9 +377,9 @@ private fun EpisodeRow(label: String, onClick: () -> Unit) {
     val source = remember { MutableInteractionSource() }
     Card(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth().pressScale(source),
-        shape = DesignTokens.Shape.MD,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).pressScale(source),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest),
         interactionSource = source,
     ) {
         Row(
@@ -542,30 +393,6 @@ private fun EpisodeRow(label: String, onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Icon(Icons.Rounded.PlayCircle, null, tint = MaterialTheme.colorScheme.primary)
-        }
-    }
-}
-
-@Composable
-private fun RecommendationsSection(
-    recommendations: List<com.fkbox.app.data.moviebox.Item>,
-    onOpen: (String) -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        SectionHeader(title = stringResource(R.string.more_like_this))
-
-        LazyRow(
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            items(recommendations, key = { it.id }) { item ->
-                PosterCard(item = item, onClick = { onOpen(item.id) }, modifier = Modifier.width(150.dp))
-            }
         }
     }
 }
